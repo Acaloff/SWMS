@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ 클래스 생명주기</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+            --text-color: #333;
+            --light-text: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --font-heading: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            --font-body: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            --code-font: 'Consolas', 'Monaco', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 5px solid var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            font-family: var(--font-heading);
+            color: var(--secondary-color);
+            margin: 1.5rem 0 1rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-family: var(--font-heading);
+            color: var(--secondary-color);
+            margin: 1.5rem 0 0.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .class-section {
+            margin: 2rem 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            border-radius: 5px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: var(--code-font);
+            color: #f8f8f2;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            white-space: pre;
+        }
+        
+        .comment {
+            color: #6a9955;
+        }
+        
+        .keyword {
+            color: #569cd6;
+        }
+        
+        .string {
+            color: #ce9178;
+        }
+        
+        .type {
+            color: #4ec9b0;
+        }
+        
+        .function {
+            color: #dcdcaa;
+        }
+        
+        .number {
+            color: #b5cea8;
+        }
+        
+        .note {
+            background-color: #e7f5ff;
+            border-left: 5px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .example-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px 4px 0 0;
+            font-weight: bold;
+        }
+        
+        .example-content {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .lifecycle-diagram {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .lifecycle-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .lifecycle-step {
+            display: flex;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+        
+        .step-number {
+            background-color: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+        
+        .step-content {
+            flex: 1;
+            background-color: var(--light-bg);
+            padding: 0.8rem;
+            border-radius: 4px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin: 0.5rem 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: var(--card-shadow);
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: left;
+            padding: 0.8rem;
+        }
+        
+        td {
+            padding: 0.8rem;
+            border-top: 1px solid #eee;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--light-bg);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>C++ 클래스 생명주기</h1>
+            <p>클래스의 생성, 소멸, 생성자, 소멸자, 복사 생성자, 복사 대입 연산자</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section>
+            <h2>클래스와 객체 개요</h2>
+            <p>C++에서 클래스(Class)는 데이터와 함수를 캡슐화한 사용자 정의 데이터 타입</p>
+            <p>객체(Object)는 클래스의 인스턴스로, 메모리에 실제로 할당된 실체</p>
+            
+            <div class="lifecycle-diagram">
+                <h3>클래스 객체의 생명주기</h3>
+                <div class="lifecycle-container">
+                    <div class="lifecycle-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">객체 생성 및 생성자 호출</div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div class="lifecycle-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">객체 사용 (멤버 함수 호출, 데이터 접근)</div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div class="lifecycle-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">객체 소멸 및 소멸자 호출</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="class-section">
+            <div class="section-header">클래스 생성</div>
+            <div class="section-content">
+                <p>C++에서 클래스는 <code class="keyword">class</code> 또는 <code class="keyword">struct</code> 키워드로 정의</p>
+                <p><code class="keyword">class</code>의 기본 접근 지정자는 private, <code class="keyword">struct</code>의 기본 접근 지정자는 public</p>
+                
+                <div class="code-block">
+<code><span class="comment">// 클래스 정의 방법</span>
+<span class="keyword">class</span> <span class="type">Person</span> {
+<span class="keyword">private</span>:
+    <span class="comment">// private 멤버 변수</span>
+    <span class="type">std</span>::<span class="type">string</span> name;
+    <span class="keyword">int</span> age;
+    
+<span class="keyword">public</span>:
+    <span class="comment">// 생성자</span>
+    <span class="function">Person</span>();                           <span class="comment">// 기본 생성자</span>
+    <span class="function">Person</span>(<span class="type">std</span>::<span class="type">string</span> n, <span class="keyword">int</span> a);  <span class="comment">// 매개변수가 있는 생성자</span>
+    <span class="function">Person</span>(<span class="keyword">const</span> <span class="type">Person</span>& other);      <span class="comment">// 복사 생성자</span>
+    
+    <span class="comment">// 소멸자</span>
+    ~<span class="function">Person</span>();
+    
+    <span class="comment">// 연산자 오버로딩</span>
+    <span class="type">Person</span>& <span class="keyword">operator</span>=(<span class="keyword">const</span> <span class="type">Person</span>& other);  <span class="comment">// 복사 대입 연산자</span>
+    
+    <span class="comment">// 멤버 함수</span>
+    <span class="keyword">void</span> <span class="function">display</span>() <span class="keyword">const</span>;
+    <span class="keyword">void</span> <span class="function">setName</span>(<span class="type">std</span>::<span class="type">string</span> n);
+    <span class="keyword">void</span> <span class="function">setAge</span>(<span class="keyword">int</span> a);
+};</code>
+                </div>
+                
+                <div class="note">
+                    <strong>참고:</strong> 클래스 정의는 보통 헤더 파일(.h 또는 .hpp)에 작성하고, 멤버 함수의 구현은 소스 파일(.cpp)에 작성
+                </div>
+            </div>
+        </div>
+        
+        <div class="class-section">
+            <div class="section-header">생성자(Constructor)</div>
+            <div class="section-content">
+                <p>생성자는 객체가 생성될 때 자동으로 호출되는 특별한 멤버 함수</p>
+                <p>주로 멤버 변수 초기화와 자원 할당 담당</p>
+                
+                <h3>생성자 종류</h3>
+                <table>
+                    <tr>
+                        <th>종류</th>
+                        <th>설명</th>
+                    </tr>
+                    <tr>
+                        <td>기본 생성자</td>
+                        <td>매개변수가 없는 생성자, 명시적으로 정의하지 않으면 컴파일러가 암시적으로 생성 (특정 조건에 한해)</td>
+                    </tr>
+                    <tr>
+                        <td>매개변수가 있는 생성자</td>
+                        <td>하나 이상의 매개변수를 받는 생성자</td>
+                    </tr>
+                    <tr>
+                        <td>복사 생성자</td>
+                        <td>같은 클래스의 다른 객체를 기반으로 새 객체를 초기화하는 생성자</td>
+                    </tr>
+                    <tr>
+                        <td>이동 생성자 (C++11)</td>
+                        <td>다른 객체의 자원을 현재 객체로 이동시키는 생성자</td>
+                    </tr>
+                    <tr>
+                        <td>위임 생성자 (C++11)</td>
+                        <td>같은 클래스의 다른 생성자에게 초기화를 위임하는 생성자</td>
+                    </tr>
+                </table>
+                
+                <div class="code-block">
+<code><span class="comment">// 생성자 구현 예시</span>
+<span class="comment">// 기본 생성자</span>
+<span class="type">Person</span>::<span class="function">Person</span>() : name(<span class="string">""</span>), age(<span class="number">0</span>) {
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"기본 생성자 호출"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+}
+
+<span class="comment">// 매개변수가 있는 생성자</span>
+<span class="type">Person</span>::<span class="function">Person</span>(<span class="type">std</span>::<span class="type">string</span> n, <span class="keyword">int</span> a) : name(n), age(a) {
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"매개변수 생성자 호출"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+}
+
+<span class="comment">// 초기화 리스트 사용 (멤버 초기화 권장 방법)</span>
+<span class="type">Person</span>::<span class="function">Person</span>(<span class="type">std</span>::<span class="type">string</span> n, <span class="keyword">int</span> a) 
+    : name(n),    <span class="comment">// 멤버 초기화 리스트</span>
+      age(a)      <span class="comment">// 생성자 본문 전에 멤버 초기화</span>
+{
+    <span class="comment">// 초기화 외 추가 작업</span>
+}</code>
+                </div>
+                
+                <div class="note">
+                    <strong>참고:</strong> 멤버 초기화는 생성자 본문보다 초기화 리스트를 사용하는 것이 더 효율적. 특히 클래스 타입 멤버의 경우 초기화 리스트를 사용하면 불필요한 기본 생성 후 대입 과정 방지
+                </div>
+            </div>
+        </div>
+        
+        <div class="class-section">
+            <div class="section-header">소멸자(Destructor)</div>
+            <div class="section-content">
+                <p>소멸자는 객체가 소멸될 때 자동으로 호출되는 특별한 멤버 함수</p>
+                <p>주로 객체가 사용한 자원 해제와 정리 작업 담당</p>
+                <p>클래스당 하나의 소멸자만 존재 가능, 매개변수를 가질 수 없음</p>
+                
+                <div class="code-block">
+<code><span class="comment">// 소멸자 정의와 구현</span>
+<span class="comment">// 클래스 정의에서</span>
+<span class="keyword">class</span> <span class="type">Person</span> {
+<span class="keyword">public</span>:
+    ~<span class="function">Person</span>();  <span class="comment">// 소멸자 선언</span>
+};
+
+<span class="comment">// 소멸자 구현</span>
+<span class="type">Person</span>::~<span class="function">Person</span>() {
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"소멸자 호출: "</span> << name << <span class="type">std</span>::<span class="function">endl</span>;
+    <span class="comment">// 동적 할당된 메모리 해제 등의 자원 정리 작업</span>
+}</code>
+                </div>
+                
+                <div class="note">
+                    <strong>중요:</strong> 클래스가 동적 메모리나 외부 자원을 관리할 경우 명시적으로 소멸자를 정의해야 함. 그렇지 않으면 메모리 누수 발생 가능
+                </div>
+                
+                <h3>소멸자 호출 시점</h3>
+                <ul>
+                    <li>지역 객체(스택에 생성)가 범위를 벗어날 때</li>
+                    <li>동적으로 생성된 객체(힙에 생성)가 <span class="keyword">delete</span>로 명시적으로 제거될 때</li>
+                    <li>프로그램이 종료될 때 전역 또는 정적 객체의 경우</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="class-section">
+            <div class="section-header">복사 생성자(Copy Constructor)</div>
+            <div class="section-content">
+                <p>복사 생성자는 같은 클래스의 다른 객체를 기반으로 새 객체를 초기화할 때 호출되는 특별한 생성자</p>
+                <p>매개변수로 같은 클래스의 const 참조를 받음</p>
+                
+                <div class="code-block">
+<code><span class="comment">// 복사 생성자 정의와 구현</span>
+<span class="comment">// 클래스 정의에서</span>
+<span class="keyword">class</span> <span class="type">Person</span> {
+<span class="keyword">public</span>:
+    <span class="function">Person</span>(<span class="keyword">const</span> <span class="type">Person</span>& other);  <span class="comment">// 복사 생성자 선언</span>
+};
+
+<span class="comment">// 복사 생성자 구현</span>
+<span class="type">Person</span>::<span class="function">Person</span>(<span class="keyword">const</span> <span class="type">Person</span>& other) : name(other.name), age(other.age) {
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"복사 생성자 호출"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    <span class="comment">// 깊은 복사가 필요한 경우 추가 작업</span>
+}</code>
+                </div>
+                
+                <h3>복사 생성자가 호출되는 상황</h3>
+                <ul>
+                    <li>기존 객체로 새 객체를 초기화할 때</li>
+                    <li>함수에 객체를 값으로 전달할 때</li>
+                    <li>함수가 객체를 값으로 반환할 때</li>
+                </ul>
+                
+                <div class="code-block">
+<code><span class="comment">// 복사 생성자 호출 예시</span>
+<span class="type">Person</span> person1(<span class="string">"박재형형"</span>, <span class="number">30</span>);  <span class="comment">// 매개변수 생성자 호출</span>
+
+<span class="comment">// 복사 생성자 호출 방식 1</span>
+<span class="type">Person</span> person2 = person1;  <span class="comment">// 복사 생성자 호출</span>
+
+<span class="comment">// 복사 생성자 호출 방식 2</span>
+<span class="type">Person</span> person3(person1);   <span class="comment">// 복사 생성자 호출</span>
+
+<span class="comment">// 함수 매개변수로 전달 (복사 생성자 호출)</span>
+<span class="keyword">void</span> <span class="function">processPerson</span>(<span class="type">Person</span> p) { ... }
+<span class="function">processPerson</span>(person1);
+
+<span class="comment">// 함수 반환값 (복사 생성자 호출 가능, RVO 최적화로 생략될 수도 있음)</span>
+<span class="type">Person</span> <span class="function">createPerson</span>() {
+    <span class="type">Person</span> temp(<span class="string">"Bob"</span>, <span class="number">25</span>);
+    <span class="keyword">return</span> temp;
+}
+<span class="type">Person</span> person4 = <span class="function">createPerson</span>();</code>
+                </div>
+                
+                <div class="note">
+                    <strong>깊은 복사 vs 얕은 복사:</strong> 클래스가 동적 메모리를 관리하는 경우, 기본 복사 생성자는 얕은 복사만 수행하므로 포인터 멤버가 같은 메모리를 가리키게 됨. 이 경우 직접 깊은 복사를 수행하는 복사 생성자를 정의해야 함
+                </div>
+            </div>
+        </div>
+        
+        <div class="class-section">
+            <div class="section-header">복사 대입 연산자(Copy Assignment Operator)</div>
+            <div class="section-content">
+                <p>복사 대입 연산자는 이미 생성된 객체에 다른 객체의 값을 대입할 때 호출되는 연산자</p>
+                <p>operator= 함수로 구현하며, 자기 참조를 반환하는 것이 관례. 왜냐면 = 연달아 쓸 수도 있어서.</p>
+                
+                <div class="code-block">
+<code><span class="comment">// 복사 대입 연산자 정의와 구현</span>
+<span class="comment">// 클래스 정의에서</span>
+<span class="keyword">class</span> <span class="type">Person</span> {
+<span class="keyword">public</span>:
+    <span class="type">Person</span>& <span class="keyword">operator</span>=(<span class="keyword">const</span> <span class="type">Person</span>& other);  <span class="comment">// 복사 대입 연산자 선언</span>
+};
+
+<span class="comment">// 복사 대입 연산자 구현</span>
+<span class="type">Person</span>& <span class="type">Person</span>::<span class="keyword">operator</span>=(<span class="keyword">const</span> <span class="type">Person</span>& other) {
+    <span class="comment">// 자기 대입 검사 (중요!)</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span> != &other) {
+        <span class="comment">// 기존 자원 정리 (필요한 경우)</span>
+        <span class="comment">// 예: delete[] dynamicArray;</span>
+        
+        <span class="comment">// 새 값 복사</span>
+        name = other.name;
+        age = other.age;
+        
+        <span class="comment">// 깊은 복사가 필요한 경우 추가 작업</span>
+        <span class="comment">// 예: dynamicArray = new int[size];</span>
+        <span class="comment">// for (int i = 0; i < size; i++) dynamicArray[i] = other.dynamicArray[i];</span>
+    }
+    
+    <span class="comment">// 현재 객체의 참조 반환 (연쇄 대입 지원)</span>
+    <span class="keyword">return</span> *<span class="keyword">this</span>;
+}</code>
+                </div>
+                
+                <h3>복사 대입 연산자 vs 복사 생성자</h3>
+                <table>
+                    <tr>
+                        <th>특성</th>
+                        <th>복사 생성자</th>
+                        <th>복사 대입 연산자</th>
+                    </tr>
+                    <tr>
+                        <td>호출 시점</td>
+                        <td>새 객체 생성 및 초기화 시</td>
+                        <td>이미 존재하는 객체에 값 대입 시</td>
+                    </tr>
+                    <tr>
+                        <td>구문</td>
+                        <td>Person p2 = p1; 또는 Person p2(p1);</td>
+                        <td>p2 = p1;</td>
+                    </tr>
+                    <tr>
+                        <td>기존 자원 정리</td>
+                        <td>필요 없음 (객체가 방금 생성됨)</td>
+                        <td>필요함 (기존 객체가 이미 자원을 가질 수 있음)</td>
+                    </tr>
+                    <tr>
+                        <td>반환 타입</td>
+                        <td>없음</td>
+                        <td>보통 자기 참조 (T&)</td>
+                    </tr>
+                </table>
+                
+                <div class="code-block">
+<code><span class="comment">// 복사 대입 연산자 호출 예시</span>
+<span class="type">Person</span> person1(<span class="string">"SWMS"</span>, <span class="number">30</span>);
+<span class="type">Person</span> person2(<span class="string">"Solion"</span>, <span class="number">25</span>);
+
+<span class="comment">// 복사 대입 연산자 호출</span>
+person2 = person1;  <span class="comment">// person2.operator=(person1) 호출</span>
+
+<span class="comment">// 연쇄 대입</span>
+<span class="type">Person</span> person3;
+person3 = person2 = person1;  <span class="comment">// 오른쪽에서 왼쪽으로 평가</span></code>
+                </div>
+                
+                <div class="note">
+                    <strong>중요:</strong> 복사 대입 연산자에서 자기 대입 검사는 필수. 그렇지 않으면 자원을 정리한 후 그 자원을 다시 참조하려고 할 때 오류 발생 가능
+                </div>
+            </div>
+        </div>
+        
+        <div class="class-section">
+            <div class="section-header">객체 소멸</div>
+            <div class="section-content">
+                <p>객체 소멸은 객체가 메모리에서 제거되는 과정</p>
+                <p>소멸자가 호출된 후 객체가 차지하던 메모리 공간이 해제</p>
+                
+                <h3>객체 소멸 시점</h3>
+                <ul>
+                    <li>지역 객체: 선언된 블록을 벗어날 때</li>
+                    <li>동적으로 생성된 객체: <span class="keyword">delete</span> 또는 <span class="keyword">delete[]</span> 연산자 사용 시</li>
+                    <li>정적 객체: 프로그램 종료 시</li>
+                    <li>멤버 객체: 소유하는 객체가 소멸될 때</li>
+                </ul>
+                
+                <div class="code-block">
+<code><span class="comment">// 다양한 객체 소멸 예시</span>
+<span class="keyword">void</span> <span class="function">exampleFunction</span>() {
+    <span class="type">Person</span> localPerson;  <span class="comment">// 스택에 생성</span>
+    <span class="comment">// 함수 내 코드...</span>
+}  <span class="comment">// 함수 종료 시 localPerson의 소멸자 호출</span>
+
+<span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="comment">// 동적 생성 객체</span>
+    <span class="type">Person</span>* dynamicPerson = <span class="keyword">new</span> <span class="type">Person</span>(<span class="string">"Dynamic"</span>, <span class="number">40</span>);
+    
+    <span class="comment">// 작업 수행...</span>
+    
+    <span class="keyword">delete</span> dynamicPerson;  <span class="comment">// 소멸자 호출 및 메모리 해제</span>
+    
+    {  <span class="comment">// 범위 지정 블록</span>
+        <span class="type">Person</span> scopedPerson;
+        <span class="comment">// 블록 내 코드...</span>
+    }  <span class="comment">// 블록 종료 시 scopedPerson의 소멸자 호출</span>
+    
+    <span class="comment">// 스마트 포인터 사용 (C++11)</span>
+    {
+        <span class="type">std</span>::<span class="type">unique_ptr</span><<span class="type">Person</span>> smartPerson = 
+            <span class="type">std</span>::<span class="function">make_unique</span><<span class="type">Person</span>>(<span class="string">"Smart"</span>, <span class="number">35</span>);
+        <span class="comment">// 스마트 포인터가 범위를 벗어날 때 자동으로 소멸자 호출</span>
+    }
+    
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code>
+                </div>
+            </div>
+        </div>
+        
+        <section>
+            <h2>종합 예제: 깊은 복사가 필요한 클래스</h2>
+            
+            <div class="example-header">
+                동적 메모리를 관리하는 클래스의 생성자, 소멸자, 복사 생성자, 복사 대입 연산자 구현
+            </div>
+            <div class="example-content">
+                <div class="code-block">
+<code><span class="comment">// 동적 배열을 관리하는 클래스 예제</span>
+<span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;algorithm&gt;</span>  <span class="comment">// std::copy</span>
+
+<span class="keyword">class</span> <span class="type">DynamicArray</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">int</span>* data;       <span class="comment">// 동적 할당된 배열을 가리키는 포인터</span>
+    <span class="keyword">size_t</span> size;    <span class="comment">// 배열 크기</span>
+    
+<span class="keyword">public</span>:
+    <span class="comment">// 기본 생성자</span>
+    <span class="function">DynamicArray</span>() : data(<span class="keyword">nullptr</span>), size(<span class="number">0</span>) {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"기본 생성자 호출"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// 매개변수 생성자</span>
+    <span class="function">DynamicArray</span>(<span class="keyword">size_t</span> sz) : size(sz) {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"매개변수 생성자 호출"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+        data = <span class="keyword">new</span> <span class="keyword">int</span>[size]();  <span class="comment">// 0으로 초기화</span>
+    }
+    
+    <span class="comment">// 복사 생성자 - 깊은 복사 구현</span>
+    <span class="function">DynamicArray</span>(<span class="keyword">const</span> <span class="type">DynamicArray</span>& other) : size(other.size) {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"복사 생성자 호출"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+        
+        <span class="comment">// 새 메모리 할당</span>
+        data = <span class="keyword">new</span> <span class="keyword">int</span>[size];
+        
+        <span class="comment">// 다른 객체의 데이터 복사</span>
+        <span class="type">std</span>::<span class="function">copy</span>(other.data, other.data + size, data);
+    }
+    
+    <span class="comment">// 소멸자</span>
+    ~<span class="function">DynamicArray</span>() {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"소멸자 호출"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+        <span class="keyword">delete</span>[] data;  <span class="comment">// 동적 할당된 메모리 해제</span>
+    }
+    
+    <span class="comment">// 복사 대입 연산자 - 깊은 복사 구현</span>
+    <span class="type">DynamicArray</span>& <span class="keyword">operator</span>=(<span class="keyword">const</span> <span class="type">DynamicArray</span>& other) {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"복사 대입 연산자 호출"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+        
+        <span class="comment">// 자기 대입 검사</span>
+        <span class="keyword">if</span> (<span class="keyword">this</span> != &other) {
+            <span class="comment">// 기존 메모리 해제</span>
+            <span class="keyword">delete</span>[] data;
+            
+            <span class="comment">// 새 크기 설정</span>
+            size = other.size;
+            
+            <span class="comment">// 새 메모리 할당</span>
+            data = <span class="keyword">new</span> <span class="keyword">int</span>[size];
+            
+            <span class="comment">// 데이터 복사</span>
+            <span class="type">std</span>::<span class="function">copy</span>(other.data, other.data + size, data);
+        }
+        
+        <span class="keyword">return</span> *<span class="keyword">this</span>;
+    }
+    
+    <span class="comment">// 데이터 접근 및 수정 함수</span>
+    <span class="keyword">void</span> <span class="function">setValue</span>(<span class="keyword">size_t</span> index, <span class="keyword">int</span> value) {
+        <span class="keyword">if</span> (index < size) {
+            data[index] = value;
+        }
+    }
+    
+    <span class="keyword">int</span> <span class="function">getValue</span>(<span class="keyword">size_t</span> index) <span class="keyword">const</span> {
+        <span class="keyword">if</span> (index < size) {
+            <span class="keyword">return</span> data[index];
+        }
+        <span class="keyword">return</span> -<span class="number">1</span>;  <span class="comment">// 에러 값</span>
+    }
+    
+    <span class="keyword">size_t</span> <span class="function">getSize</span>() <span class="keyword">const</span> {
+        <span class="keyword">return</span> size;
+    }
+};
+
+<span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="comment">// 매개변수 생성자 사용</span>
+    <span class="type">DynamicArray</span> arr1(<span class="number">5</span>);
+    
+    <span class="comment">// 값 설정</span>
+    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i < arr1.<span class="function">getSize</span>(); ++i) {
+        arr1.<span class="function">setValue</span>(i, i * <span class="number">10</span>);
+    }
+    
+    <span class="comment">// 복사 생성자 호출</span>
+    <span class="type">DynamicArray</span> arr2 = arr1;
+    
+    <span class="comment">// arr2 수정</span>
+    arr2.<span class="function">setValue</span>(<span class="number">0</span>, <span class="number">100</span>);
+    
+    <span class="comment">// 기본 생성자 호출</span>
+    <span class="type">DynamicArray</span> arr3;
+    
+    <span class="comment">// 복사 대입 연산자 호출</span>
+    arr3 = arr1;
+    
+    <span class="comment">// 결과 출력</span>
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"arr1[0] = "</span> << arr1.<span class="function">getValue</span>(<span class="number">0</span>) << <span class="type">std</span>::<span class="function">endl</span>;  <span class="comment">// 0</span>
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"arr2[0] = "</span> << arr2.<span class="function">getValue</span>(<span class="number">0</span>) << <span class="type">std</span>::<span class="function">endl</span>;  <span class="comment">// 100</span>
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"arr3[0] = "</span> << arr3.<span class="function">getValue</span>(<span class="number">0</span>) << <span class="type">std</span>::<span class="function">endl</span>;  <span class="comment">// 0</span>
+    
+    <span class="keyword">return</span> <span class="number">0</span>;
+    <span class="comment">// 함수 종료 시 arr1, arr2, arr3의 소멸자가 차례로 호출</span>
+}</code>
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <h2>Rule of Three/Five/Zero</h2>
+            
+            <div class="note">
+                <h3>Rule of Three (C++98/03)</h3>
+                <p>클래스가 다음 중 하나라도 직접 정의하면 나머지 두 개도 정의해야</p>
+                <ul>
+                    <li>소멸자</li>
+                    <li>복사 생성자</li>
+                    <li>복사 대입 연산자</li>
+                </ul>
+            </div>
+            
+            <div class="note">
+                <h3>Rule of Five (C++11)</h3>
+                <p>Rule of Three에 두 가지 추가</p>
+                <ul>
+                    <li>이동 생성자</li>
+                    <li>이동 대입 연산자</li>
+                </ul>
+            </div>
+            
+            <div class="note">
+                <h3>Rule of Zero (Modern C++)</h3>
+                <p>자원 관리가 필요 없는 클래스는 특수 멤버 함수를 직접 정의하지 않는 것이 좋음</p>
+                <p>자원 관리는 적절한 RAII 클래스(std::string, std::vector, std::unique_ptr 등)에 위임</p>
+            </div>
+        </section>
+        
+        <section>
+            <h2>모던 C++ 관련 참고 사항</h2>
+            
+            <div class="class-section">
+                <div class="section-header">C++11 이후 추가된 기능</div>
+                <div class="section-content">
+                    <h3>1. 이동 의미론(Move Semantics)</h3>
+                    <p>이동 생성자와 이동 대입 연산자를 통해 리소스 소유권을 효율적으로 전달</p>
+                    
+                    <h3>2. 기본/삭제된 함수 지정</h3>
+                    <div class="code-block">
+<code><span class="keyword">class</span> <span class="type">Modern</span> {
+<span class="keyword">public</span>:
+    <span class="comment">// 기본 생성자를 컴파일러가 생성하도록 지정</span>
+    <span class="type">Modern</span>() = <span class="keyword">default</span>;
+    
+    <span class="comment">// 복사 생성자 삭제 (복사 금지)</span>
+    <span class="type">Modern</span>(<span class="keyword">const</span> <span class="type">Modern</span>&) = <span class="keyword">delete</span>;
+    
+    <span class="comment">// 복사 대입 연산자 삭제</span>
+    <span class="type">Modern</span>& <span class="keyword">operator</span>=(<span class="keyword">const</span> <span class="type">Modern</span>&) = <span class="keyword">delete</span>;
+};</code>
+                    </div>
+                    
+                    <h3>3. 스마트 포인터</h3>
+                    <p>std::unique_ptr, std::shared_ptr, std::weak_ptr를 사용한 자동 메모리 관리</p>
+                    
+                    <h3>4. 위임 생성자</h3>
+                    <p><span class="address">주의: 한 번이라도 생성자 정의하면 일반 생성자는 따로 정의해야 함.</span></p>
+                    <div class="code-block">
+<code><span class="keyword">class</span> <span class="type">Person</span> {
+<span class="keyword">private</span>:
+    <span class="type">std</span>::<span class="type">string</span> name;
+    <span class="keyword">int</span> age;
+    
+<span class="keyword">public</span>:
+    <span class="comment">// 주 생성자</span>
+    <span class="function">Person</span>(<span class="type">std</span>::<span class="type">string</span> n, <span class="keyword">int</span> a) : name(n), age(a) {}
+    
+    <span class="comment">// 위임 생성자</span>
+    
+    <span class="function">Person</span>() : <span class="function">Person</span>(<span class="string">""</span>, <span class="number">0</span>) {}
+    <span class="function">Person</span>(<span class="type">std</span>::<span class="type">string</span> n) : <span class="function">Person</span>(n, <span class="number">0</span>) {}
+};</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
