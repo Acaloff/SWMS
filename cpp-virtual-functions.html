@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ 가상함수와 추상클래스</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+            --text-color: #333;
+            --light-text: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --font-heading: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            --font-body: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            --code-font: 'Consolas', 'Monaco', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 5px solid var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-family: var(--font-heading);
+            color: var(--secondary-color);
+            margin: 1.5rem 0 1rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-family: var(--font-heading);
+            color: var(--secondary-color);
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .class-section {
+            margin: 2rem 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .section-content {
+            padding: 1.5rem;
+        }
+
+        .code-block {
+            background-color: #1e1e1e;
+            border-radius: 5px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: var(--code-font);
+            color: #f8f8f2;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            white-space: pre;
+        }
+
+        .comment {
+            color: #6a9955;
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+
+        .string {
+            color: #ce9178;
+        }
+
+        .type {
+            color: #4ec9b0;
+        }
+
+        .function {
+            color: #dcdcaa;
+        }
+
+        .number {
+            color: #b5cea8;
+        }
+
+        .note {
+            background-color: #e7f5ff;
+            border-left: 5px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .important {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .example-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px 4px 0 0;
+            font-weight: bold;
+        }
+
+        .example-content {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .inheritance-diagram {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+
+        .diagram-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .diagram-box {
+            border: 2px solid var(--secondary-color);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 0.5rem;
+            min-width: 200px;
+            background-color: var(--light-bg);
+            position: relative;
+        }
+
+        .diagram-box.abstract {
+            border-style: dashed;
+            background-color: #f8d7da;
+        }
+
+        .diagram-arrow {
+            width: 2px;
+            height: 30px;
+            background-color: var(--secondary-color);
+            position: relative;
+            margin: 0.5rem 0;
+        }
+
+        .diagram-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 8px solid var(--secondary-color);
+        }
+
+        .diagram-level {
+            display: flex;
+            justify-content: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: var(--card-shadow);
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: left;
+            padding: 0.8rem;
+        }
+
+        td {
+            padding: 0.8rem;
+            border-top: 1px solid #eee;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--light-bg);
+        }
+
+        .vtable-diagram {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: var(--card-shadow);
+        }
+
+        .vtable-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .vtable-box {
+            border: 2px solid var(--secondary-color);
+            border-radius: 6px;
+            margin: 1rem;
+            max-width: 300px;
+        }
+
+        .vtable-header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .vtable-content {
+            padding: 1rem;
+        }
+
+        .vtable-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .vtable-entry:last-child {
+            border-bottom: none;
+        }
+
+        .vtable-pointer {
+            font-family: var(--code-font);
+            color: var(--accent-color);
+        }
+
+        /* 여백 개선 */
+        section {
+            margin-bottom: 2.5rem;
+        }
+
+        ul,
+        ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .note ul,
+        .important ul {
+            margin-bottom: 0;
+        }
+
+        .section-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .vtable-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>C++ 가상함수와 추상클래스</h1>
+            <p>다형성 구현을 위한 가상 함수, 순수 가상 함수, 추상 클래스</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section>
+            <h2>다형성(Polymorphism) 개요</h2>
+            <p>다형성은 하나의 인터페이스로 여러 타입의 객체를 참조하고 각각 적절한 구현을 호출하는 객체지향 프로그래밍의 핵심 개념</p>
+            <p>C++에서는 가상 함수를 통해 런타임 다형성(동적 바인딩) 구현</p>
+
+            <div class="inheritance-diagram">
+                <h3>상속과 다형성</h3>
+                <div class="diagram-container">
+                    <div class="diagram-level">
+                        <div class="diagram-box">
+                            <strong>Shape</strong><br>
+                            <span class="keyword">virtual</span> void draw();<br>
+                            <span class="keyword">virtual</span> double area();
+                        </div>
+                    </div>
+                    <div class="diagram-arrow"></div>
+                    <div class="diagram-level">
+                        <div class="diagram-box" style="margin-right: 20px;">
+                            <strong>Circle</strong><br>
+                            void draw() <span class="keyword">override</span>;<br>
+                            double area() <span class="keyword">override</span>;
+                        </div>
+                        <div class="diagram-box">
+                            <strong>Rectangle</strong><br>
+                            void draw() <span class="keyword">override</span>;<br>
+                            double area() <span class="keyword">override</span>;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="class-section">
+            <div class="section-header">가상 함수(Virtual Function)</div>
+            <div class="section-content">
+                <p>가상 함수는 파생 클래스에서 재정의할 수 있도록 기반 클래스에서 선언하는 멤버 함수</p>
+                <p><code class="keyword">virtual</code> 키워드를 사용하여 선언</p>
+
+                <div class="code-block">
+                    <code><span class="comment">// 가상 함수 선언과 사용</span>
+<span class="keyword">class</span> <span class="type">Base</span> {
+<span class="keyword">public</span>:
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">display</span>() {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Base 클래스의 display() 함수"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="keyword">void</span> <span class="function">nonVirtual</span>() {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Base 클래스의 비가상 함수"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">class</span> <span class="type">Derived</span> : <span class="keyword">public</span> <span class="type">Base</span> {
+<span class="keyword">public</span>:
+    <span class="comment">// 가상 함수 재정의(override)</span>
+    <span class="keyword">void</span> <span class="function">display</span>() <span class="keyword">override</span> {  <span class="comment">// C++11부터 override 키워드 사용 가능</span>
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Derived 클래스의 display() 함수"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// 비가상 함수 재정의(hiding)</span>
+    <span class="keyword">void</span> <span class="function">nonVirtual</span>() {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Derived 클래스의 비가상 함수"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};</code>
+                </div>
+
+                <div class="note">
+                    <strong>주요 특징:</strong>
+                    <ul>
+                        <li>파생 클래스에서 가상 함수를 재정의하면, 기본 클래스 포인터나 참조를 통해 호출해도 파생 클래스의 함수가 호출됨</li>
+                        <li>C++11부터 <code class="keyword">override</code> 키워드로 가상 함수 재정의를 명시적으로 표시 가능</li>
+                        <li>가상 함수는 <code class="keyword">virtual</code> 키워드로 선언된 함수 또는 가상 함수를 재정의한 함수</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="class-section">
+            <div class="section-header">동적 바인딩</div>
+            <div class="section-content">
+                <p>객체 포인터를 사용해 인스턴스의 함수를 호출하는 경우, 상위/하위 객체의 함수 중 어느 것을 결정하는지는 런타임 시점에 결정된다.<br>
+                    이를 동적 바인딩이라 함.</p>
+
+                <div class="code-block">
+                    <code><span class="comment">// 동적 바인딩 예시</span>
+<span class="keyword">class</span> <span class="type">Base</span> {
+<span class="keyword">public</span>:
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">f</span>() {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Base 클래스의 f() 함수"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">class</span> <span class="type">Derived</span> : <span class="keyword">public</span> <span class="type">Base</span> {
+<span class="keyword">public</span>:
+    <span class="comment">// 함수 재정의(override)</span>
+    <span class="keyword">virtual void</span> <span class="function">f</span>() <span class="keyword"></span> { 
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Derived 클래스의 f() 함수"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">int</span> <span class="function">main</span>(){
+    <span class="type">Derived</span> d, *pDer;
+    pDer = &d;
+    pDer -> <span class="function">f</span>();
+
+    Base* pBase;
+    pBase = pDer;
+    pBase -> <span class="function">f</span>();<span class="comment">//이 코드 또한 Derived의 f()실행. 이것은 런타임에 정해진다.</span>
+}</code>
+                </div>
+
+                <div class="note">
+                    <strong>주요 특징:</strong>
+                    <ul>
+                        <li>파생 클래스에서 가상 함수를 재정의하고, 이를 부모 클래스의 포인터로 접근했을 때, 파생 클래스의 함수가 실행된다.</li>
+                        <li>이것은 C++, 객체지향 프로그램의 목적을 실현한다.</li>
+                        <li><code class="keyword">virtual</code> 키워드로 선언된 함수를 재정의할 때만 동적 바인딩이 일어난다. 이것에 유의하라.<br>
+                            단순히 함수를 재정의한 경우 컴파일 시점에 정적 바인딩으로 처리된다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="class-section">
+            <div class="section-header">가상 함수의 작동 원리: 가상 함수 테이블(vtable)</div>
+            <div class="section-content">
+                <p>가상 함수 테이블(vtable)은 컴파일러가 가상 함수를 구현하기 위해 생성하는 함수 포인터의 배열</p>
+                <p>각 클래스는 고유한 vtable을 가지며, 가상 함수를 포함하는 객체는 vtable을 가리키는 포인터(vptr) 보유</p>
+
+                <div class="vtable-diagram">
+                    <h3>가상 함수 테이블 구조</h3>
+                    <div class="vtable-container">
+                        <div class="vtable-box">
+                            <div class="vtable-header">Base 객체</div>
+                            <div class="vtable-content">
+                                <div class="vtable-entry">
+                                    <span>vptr</span>
+                                    <span class="vtable-pointer">→</span>
+                                </div>
+                                <div class="vtable-entry">
+                                    <span>다른 멤버들...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vtable-box">
+                            <div class="vtable-header">Base vtable</div>
+                            <div class="vtable-content">
+                                <div class="vtable-entry">
+                                    <span>display()</span>
+                                    <span>Base::display</span>
+                                </div>
+                                <div class="vtable-entry">
+                                    <span>다른 가상 함수들...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vtable-container">
+                        <div class="vtable-box">
+                            <div class="vtable-header">Derived 객체</div>
+                            <div class="vtable-content">
+                                <div class="vtable-entry">
+                                    <span>vptr</span>
+                                    <span class="vtable-pointer">→</span>
+                                </div>
+                                <div class="vtable-entry">
+                                    <span>Base 멤버들...</span>
+                                </div>
+                                <div class="vtable-entry">
+                                    <span>Derived 멤버들...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vtable-box">
+                            <div class="vtable-header">Derived vtable</div>
+                            <div class="vtable-content">
+                                <div class="vtable-entry">
+                                    <span>display()</span>
+                                    <span>Derived::display</span>
+                                </div>
+                                <div class="vtable-entry">
+                                    <span>다른 가상 함수들...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>vtable의 특징:</strong>
+                    <ul>
+                        <li>가상 함수를 포함하는 클래스의 객체는 메모리 오버헤드(vptr)가 발생</li>
+                        <li>가상 함수 호출 시 vtable을 통한 간접 호출로 약간의 성능 저하 발생 가능</li>
+                        <li>vtable은 컴파일러에 의해 자동으로 생성 및 관리됨</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="class-section">
+            <div class="section-header">순수 가상 함수(Pure Virtual Function)</div>
+            <div class="section-content">
+                <p>순수 가상 함수는 기본 클래스에서 구현되지 않고 파생 클래스에서 반드시 구현해야 하는 가상 함수</p>
+                <p>함수 선언 끝에 <code><span class="keyword">= 0</span></code>을 추가하여 순수 가상 함수로 선언</p>
+
+                <div class="code-block">
+                    <code><span class="comment">// 순수 가상 함수 선언</span>
+<span class="keyword">class</span> <span class="type">Shape</span> {
+<span class="keyword">public</span>:
+    <span class="comment">// 순수 가상 함수</span>
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> = <span class="number">0</span>;
+    <span class="keyword">virtual</span> <span class="keyword">double</span> <span class="function">area</span>() <span class="keyword">const</span> = <span class="number">0</span>;
+    
+    <span class="comment">// 일반 가상 함수(구현 제공)</span>
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">info</span>() <span class="keyword">const</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"이것은 도형"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// 일반 멤버 함수</span>
+    <span class="keyword">void</span> <span class="function">printId</span>() <span class="keyword">const</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"ID: "</span> << id << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// 가상 소멸자(중요!)</span>
+    <span class="keyword">virtual</span> ~<span class="function">Shape</span>() {}
+    
+<span class="keyword">protected</span>:
+    <span class="keyword">int</span> id = <span class="number">0</span>;
+};</code>
+                </div>
+
+                <div class="important">
+                    <strong>중요:</strong> 순수 가상 함수는 파생 클래스에서 반드시 재정의해야 함. 그렇지 않으면 파생 클래스도 추상 클래스가 되어 객체 생성 불가
+                </div>
+            </div>
+        </div>
+
+        <div class="class-section">
+            <div class="section-header">추상 클래스(Abstract Class)</div>
+            <div class="section-content">
+                <p>하나 이상의 순수 가상 함수를 포함하는 클래스</p>
+                <p>객체를 직접 생성할 수 없으며, 인터페이스 역할을 담당</p>
+                <p>파생 클래스에 대한 기본 형태를 정의하고 공통 동작 구현 가능</p>
+
+                <div class="code-block">
+                    <code><span class="comment">// 추상 클래스를 상속받는 구체 클래스</span>
+<span class="keyword">class</span> <span class="type">Circle</span> : <span class="keyword">public</span> <span class="type">Shape</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">double</span> radius;
+    
+<span class="keyword">public</span>:
+    <span class="function">Circle</span>(<span class="keyword">double</span> r) : radius(r) {
+        id = <span class="number">1</span>;  <span class="comment">// 부모 클래스의 protected 멤버 접근</span>
+    }
+    
+    <span class="comment">// 순수 가상 함수 구현(필수)</span>
+    <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"원 그리기"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="keyword">double</span> <span class="function">area</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="keyword">return</span> <span class="number">3.14</span> * radius * radius;
+    }
+    
+    <span class="comment">// 가상 함수 재정의(선택)</span>
+    <span class="keyword">void</span> <span class="function">info</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"이것은 원, 반지름: "</span> << radius << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">class</span> <span class="type">Rectangle</span> : <span class="keyword">public</span> <span class="type">Shape</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">double</span> width, height;
+    
+<span class="keyword">public</span>:
+    <span class="function">Rectangle</span>(<span class="keyword">double</span> w, <span class="keyword">double</span> h) : width(w), height(h) {
+        id = <span class="number">2</span>;
+    }
+    
+    <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"사각형 그리기"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="keyword">double</span> <span class="function">area</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="keyword">return</span> width * height;
+    }
+};</code>
+                </div>
+
+                <div class="note">
+                    <strong>추상 클래스의 사용:</strong>
+                    <ul>
+                        <li>인터페이스 및 공통 기능 정의에 유용</li>
+                        <li>다형성을 통한 코드 재사용 촉진</li>
+                        <li>캡슐화와 추상화를 강화하는 설계 패턴의 기반</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <code><span class="comment">// 추상 클래스 사용 예시</span>
+<span class="keyword">void</span> <span class="function">printShapeInfo</span>(<span class="keyword">const</span> <span class="type">Shape</span>& shape) {
+    shape.<span class="function">info</span>();
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"면적: "</span> << shape.<span class="function">area</span>() << <span class="type">std</span>::<span class="function">endl</span>;
+    shape.<span class="function">draw</span>();
+    shape.<span class="function">printId</span>();  <span class="comment">// 비가상 함수 호출</span>
+}
+
+<span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="comment">// Shape shape; // 오류: 추상 클래스의 객체 생성 불가</span>
+    
+    <span class="type">Circle</span> circle(<span class="number">5.0</span>);
+    <span class="type">Rectangle</span> rectangle(<span class="number">4.0</span>, <span class="number">3.0</span>);
+    
+    <span class="function">printShapeInfo</span>(circle);     <span class="comment">// 다형성 활용</span>
+    <span class="function">printShapeInfo</span>(rectangle);  <span class="comment">// 다형성 활용</span>
+    
+    <span class="comment">// 포인터 배열을 통한 다형성</span>
+    <span class="type">Shape</span>* shapes[] = {&circle, &rectangle};
+    
+    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>& shape : shapes) {
+        shape-><span class="function">draw</span>();
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"면적: "</span> << shape-><span class="function">area</span>() << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="class-section">
+            <div class="section-header">인터페이스 클래스</div>
+            <div class="section-content">
+                <p>C++에는 Java나 C#처럼 명시적인 인터페이스 키워드가 없으나, 순수 가상 함수만 포함한 추상 클래스로 인터페이스 구현 가능</p>
+
+                <div class="code-block">
+                    <code><span class="comment">// 인터페이스 클래스 패턴</span>
+<span class="keyword">class</span> <span class="type">Drawable</span> {
+<span class="keyword">public</span>:
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> = <span class="number">0</span>;
+    <span class="keyword">virtual</span> ~<span class="function">Drawable</span>() {}  <span class="comment">// 가상 소멸자는 항상 필요</span>
+};
+
+<span class="keyword">class</span> <span class="type">Resizable</span> {
+<span class="keyword">public</span>:
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">resize</span>(<span class="keyword">double</span> factor) = <span class="number">0</span>;
+    <span class="keyword">virtual</span> ~<span class="function">Resizable</span>() {}
+};
+
+<span class="comment">// 여러 인터페이스 구현</span>
+<span class="keyword">class</span> <span class="type">Rectangle</span> : <span class="keyword">public</span> <span class="type">Shape</span>, <span class="keyword">public</span> <span class="type">Drawable</span>, <span class="keyword">public</span> <span class="type">Resizable</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">double</span> width, height;
+    
+<span class="keyword">public</span>:
+    <span class="function">Rectangle</span>(<span class="keyword">double</span> w, <span class="keyword">double</span> h) : width(w), height(h) {}
+    
+    <span class="comment">// Shape에서 상속한 순수 가상 함수 구현</span>
+    <span class="keyword">double</span> <span class="function">area</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="keyword">return</span> width * height;
+    }
+    
+    <span class="comment">// Drawable 인터페이스 구현</span>
+    <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"사각형 그리기: "</span> << width << <span class="string">" x "</span> << height << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// Resizable 인터페이스 구현</span>
+    <span class="keyword">void</span> <span class="function">resize</span>(<span class="keyword">double</span> factor) <span class="keyword">override</span> {
+        width *= factor;
+        height *= factor;
+    }
+};</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="class-section">
+            <div class="section-header">가상 소멸자(Virtual Destructor)의 중요성</div>
+            <div class="section-content">
+                <p>상속 관계에서 기본 클래스의 포인터를 통해 파생 클래스 객체를 삭제할 때, 기본 클래스의 소멸자가 가상이 아니면 파생 클래스의 소멸자가 호출되지 않음</p>
+                <p>메모리 누수 및 리소스 해제 문제 발생 가능</p>
+
+                <div class="important">
+                    <strong>중요 규칙:</strong> 가상 함수를 가진 클래스는 항상 가상 소멸자를 정의해야 함
+                </div>
+
+                <div class="code-block">
+                    <code><span class="comment">// 가상 소멸자 문제 예시</span>
+<span class="keyword">class</span> <span class="type">Base</span> {
+<span class="keyword">public</span>:
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">someFunction</span>() {}
+    ~<span class="function">Base</span>() {  <span class="comment">// 비가상 소멸자</span>
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Base 소멸자"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">class</span> <span class="type">Derived</span> : <span class="keyword">public</span> <span class="type">Base</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">int</span>* data;
+    
+<span class="keyword">public</span>:
+    <span class="function">Derived</span>() {
+        data = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">100</span>];
+    }
+    
+    ~<span class="function">Derived</span>() {
+        <span class="keyword">delete</span>[] data;
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Derived 소멸자"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="type">Base</span>* ptr = <span class="keyword">new</span> <span class="type">Derived</span>();
+    <span class="keyword">delete</span> ptr;  <span class="comment">// Derived의 소멸자가 호출되지 않음 - 메모리 누수 발생!</span>
+    
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code>
+                </div>
+
+                <div class="code-block">
+                    <code><span class="comment">// 가상 소멸자를 사용한 올바른 예시</span>
+<span class="keyword">class</span> <span class="type">Base</span> {
+<span class="keyword">public</span>:
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">someFunction</span>() {}
+    <span class="keyword">virtual</span> ~<span class="function">Base</span>() {  <span class="comment">// 가상 소멸자</span>
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Base 소멸자"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">class</span> <span class="type">Derived</span> : <span class="keyword">public</span> <span class="type">Base</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">int</span>* data;
+    
+<span class="keyword">public</span>:
+    <span class="function">Derived</span>() {
+        data = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">100</span>];
+    }
+    
+    ~<span class="function">Derived</span>() <span class="keyword">override</span> {  <span class="comment">// C++11에서는 override 키워드 사용 가능</span>
+        <span class="keyword">delete</span>[] data;
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"Derived 소멸자"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="type">Base</span>* ptr = <span class="keyword">new</span> <span class="type">Derived</span>();
+    <span class="keyword">delete</span> ptr;  <span class="comment">// 이제 Derived의 소멸자가 먼저 호출되고, 그 다음 Base의 소멸자가 호출됨</span>
+    
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <h2>종합 예제: 도형 계층 구조</h2>
+
+            <div class="example-header">
+                추상 클래스와 가상 함수를 활용한 도형 클래스 계층 구조
+            </div>
+            <div class="example-content">
+                <div class="code-block">
+                    <code><span class="comment">// 포괄적인 도형 계층 구조 예제</span>
+<span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;vector&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;cmath&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;memory&gt;</span>  <span class="comment">// C++11 스마트 포인터</span>
+
+<span class="comment">// 추상 기본 클래스</span>
+<span class="keyword">class</span> <span class="type">Shape</span> {
+<span class="keyword">protected</span>:
+    <span class="type">std</span>::<span class="type">string</span> name;
+    
+<span class="keyword">public</span>:
+    <span class="function">Shape</span>(<span class="keyword">const</span> <span class="type">std</span>::<span class="type">string</span>& n) : name(n) {}
+    
+    <span class="comment">// 순수 가상 함수들</span>
+    <span class="keyword">virtual</span> <span class="keyword">double</span> <span class="function">area</span>() <span class="keyword">const</span> = <span class="number">0</span>;
+    <span class="keyword">virtual</span> <span class="keyword">double</span> <span class="function">perimeter</span>() <span class="keyword">const</span> = <span class="number">0</span>;
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> = <span class="number">0</span>;
+    
+    <span class="comment">// 일반 가상 함수</span>
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="function">printInfo</span>() <span class="keyword">const</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"도형: "</span> << name << <span class="type">std</span>::<span class="function">endl</span>;
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"면적: "</span> << <span class="function">area</span>() << <span class="type">std</span>::<span class="function">endl</span>;
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"둘레: "</span> << <span class="function">perimeter</span>() << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// 비가상 함수</span>
+    <span class="type">std</span>::<span class="type">string</span> <span class="function">getName</span>() <span class="keyword">const</span> {
+        <span class="keyword">return</span> name;
+    }
+    
+    <span class="comment">// 가상 소멸자</span>
+    <span class="keyword">virtual</span> ~<span class="function">Shape</span>() {
+        <span class="type">std</span>::<span class="function">cout</span> << name << <span class="string">" 소멸"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="comment">// 구체 클래스: 원</span>
+<span class="keyword">class</span> <span class="type">Circle</span> : <span class="keyword">public</span> <span class="type">Shape</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">double</span> radius;
+    
+<span class="keyword">public</span>:
+    <span class="function">Circle</span>(<span class="keyword">double</span> r) : <span class="type">Shape</span>(<span class="string">"원"</span>), radius(r) {}
+    
+    <span class="keyword">double</span> <span class="function">area</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="keyword">return</span> M_PI * radius * radius;
+    }
+    
+    <span class="keyword">double</span> <span class="function">perimeter</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="keyword">return</span> <span class="number">2</span> * M_PI * radius;
+    }
+    
+    <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"원 그리기 (반지름 "</span> << radius << <span class="string">")"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// Circle 전용 함수</span>
+    <span class="keyword">double</span> <span class="function">getRadius</span>() <span class="keyword">const</span> {
+        <span class="keyword">return</span> radius;
+    }
+};
+
+<span class="comment">// 구체 클래스: 직사각형</span>
+<span class="keyword">class</span> <span class="type">Rectangle</span> : <span class="keyword">public</span> <span class="type">Shape</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">double</span> width, height;
+    
+<span class="keyword">public</span>:
+    <span class="function">Rectangle</span>(<span class="keyword">double</span> w, <span class="keyword">double</span> h) : <span class="type">Shape</span>(<span class="string">"직사각형"</span>), width(w), height(h) {}
+    
+    <span class="keyword">double</span> <span class="function">area</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="keyword">return</span> width * height;
+    }
+    
+    <span class="keyword">double</span> <span class="function">perimeter</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="keyword">return</span> <span class="number">2</span> * (width + height);
+    }
+    
+    <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"직사각형 그리기 ("</span> << width << <span class="string">" x "</span> << height << <span class="string">")"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// printInfo 재정의</span>
+    <span class="keyword">void</span> <span class="function">printInfo</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="type">Shape</span>::<span class="function">printInfo</span>();  <span class="comment">// 기본 클래스 메서드 호출</span>
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"가로: "</span> << width << <span class="string">, 세로: "</span> << height << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="comment">// 직사각형에서 파생된 정사각형</span>
+<span class="keyword">class</span> <span class="type">Square</span> : <span class="keyword">public</span> <span class="type">Rectangle</span> {
+<span class="keyword">public</span>:
+    <span class="function">Square</span>(<span class="keyword">double</span> side) : <span class="type">Rectangle</span>(side, side) {
+        name = <span class="string">"정사각형"</span>;  <span class="comment">// 기본 클래스의 protected 멤버 수정</span>
+    }
+};
+
+<span class="comment">// 구체 클래스: 삼각형</span>
+<span class="keyword">class</span> <span class="type">Triangle</span> : <span class="keyword">public</span> <span class="type">Shape</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">double</span> a, b, c;  <span class="comment">// 세 변의 길이</span>
+    
+<span class="keyword">public</span>:
+    <span class="function">Triangle</span>(<span class="keyword">double</span> sideA, <span class="keyword">double</span> sideB, <span class="keyword">double</span> sideC) 
+        : <span class="type">Shape</span>(<span class="string">"삼각형"</span>), a(sideA), b(sideB), c(sideC) {}
+    
+    <span class="keyword">double</span> <span class="function">area</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="comment">// 헤론의 공식</span>
+        <span class="keyword">double</span> s = (a + b + c) / <span class="number">2</span>;
+        <span class="keyword">return</span> <span class="function">sqrt</span>(s * (s - a) * (s - b) * (s - c));
+    }
+    
+    <span class="keyword">double</span> <span class="function">perimeter</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="keyword">return</span> a + b + c;
+    }
+    
+    <span class="keyword">void</span> <span class="function">draw</span>() <span class="keyword">const</span> <span class="keyword">override</span> {
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"삼각형 그리기 (변: "</span> << a << <span class="string">", "</span> << b << <span class="string">", "</span> << c << <span class="string">")"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+};
+
+<span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="comment">// 스마트 포인터를 사용한 Shape 객체 관리</span>
+    <span class="type">std</span>::<span class="type">vector</span><<span class="type">std</span>::<span class="type">unique_ptr</span><<span class="type">Shape</span>>> shapes;
+    
+    <span class="comment">// 다양한 도형 추가</span>
+    shapes.<span class="function">push_back</span>(<span class="type">std</span>::<span class="function">make_unique</span><<span class="type">Circle</span>>(<span class="number">5.0</span>));
+    shapes.<span class="function">push_back</span>(<span class="type">std</span>::<span class="function">make_unique</span><<span class="type">Rectangle</span>>(<span class="number">4.0</span>, <span class="number">3.0</span>));
+    shapes.<span class="function">push_back</span>(<span class="type">std</span>::<span class="function">make_unique</span><<span class="type">Square</span>>(<span class="number">2.0</span>));
+    shapes.<span class="function">push_back</span>(<span class="type">std</span>::<span class="function">make_unique</span><<span class="type">Triangle</span>>(<span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>));
+    
+    <span class="comment">// 다형성을 활용한 처리</span>
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"==== 도형 정보 ===="</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>& shape : shapes) {
+        shape-><span class="function">printInfo</span>();
+        shape-><span class="function">draw</span>();
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"---------------"</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    }
+    
+    <span class="comment">// 특정 타입 작업 (dynamic_cast 활용)</span>
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"\n==== 원 객체만 특별 처리 ====="</span> << <span class="type">std</span>::<span class="function">endl</span>;
+    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>& shape : shapes) {
+        <span class="keyword">if</span> (<span class="keyword">const</span> <span class="type">Circle</span>* circle = <span class="keyword">dynamic_cast</span><<span class="keyword">const</span> <span class="type">Circle</span>*>(shape.<span class="function">get</span>())) {
+            <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"원 발견! 반지름: "</span> << circle-><span class="function">getRadius</span>() << <span class="type">std</span>::<span class="function">endl</span>;
+        }
+    }
+    
+    <span class="comment">// 총 면적 계산</span>
+    <span class="keyword">double</span> totalArea = <span class="number">0.0</span>;
+    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>& shape : shapes) {
+        totalArea += shape-><span class="function">area</span>();
+    }
+    <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"\n모든 도형의 총 면적: "</span> << totalArea << <span class="type">std</span>::<span class="function">endl</span>;
+    
+    <span class="comment">// 소멸자 자동 호출 (unique_ptr의 범위를 벗어날 때)</span>
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>가상 함수, 순수 가상 함수, 추상 클래스 비교</h2>
+
+            <table>
+                <tr>
+                    <th>특성</th>
+                    <th>가상 함수</th>
+                    <th>순수 가상 함수</th>
+                    <th>추상 클래스</th>
+                </tr>
+                <tr>
+                    <td>선언 방법</td>
+                    <td><code><span class="keyword">virtual void func() { ... }</span></code></td>
+                    <td><code><span class="keyword">virtual void func() = 0;</span></code></td>
+                    <td>하나 이상의 순수 가상 함수를 포함하는 클래스</td>
+                </tr>
+                <tr>
+                    <td>구현 여부</td>
+                    <td>기본 클래스에서 구현 제공</td>
+                    <td>기본 클래스에서 구현 없음(구현 가능하지만 잘 사용하지 않음)</td>
+                    <td>일부 함수는 구현하고, 일부는 구현하지 않음</td>
+                </tr>
+                <tr>
+                    <td>파생 클래스 재정의</td>
+                    <td>선택적</td>
+                    <td>필수</td>
+                    <td>순수 가상 함수는 필수, 일반 가상 함수는 선택적</td>
+                </tr>
+                <tr>
+                    <td>객체 생성</td>
+                    <td>가능</td>
+                    <td>해당 없음(함수)</td>
+                    <td>불가능</td>
+                </tr>
+                <tr>
+                    <td>주요 용도</td>
+                    <td>기본 동작 제공 + 선택적 재정의</td>
+                    <td>인터페이스 정의</td>
+                    <td>공통 인터페이스와 기본 구현 제공</td>
+                </tr>
+            </table>
+        </section>
+
+        <div class="class-section">
+            <div class="section-header">가상 함수와 관련된 주의사항</div>
+            <div class="section-content">
+                <div class="important">
+                    <strong>1. 생성자에서 가상 함수 호출</strong>
+                    <p>생성자에서 가상 함수를 호출하면 기본 클래스의 함수만 호출되고 파생 클래스의 재정의된 함수는 호출되지 않음</p>
+                </div>
+
+                <div class="important">
+                    <strong>2. 가상 함수 성능 고려사항</strong>
+                    <p>가상 함수 호출은 vtable 조회로 인한 약간의 오버헤드 발생</p>
+                    <p>성능이 매우 중요한 경우 가상 함수의 사용을 최소화하거나 인라인화 고려</p>
+                </div>
+
+                <div class="important">
+                    <strong>3. 파생 클래스에서 기본 클래스 함수 호출</strong>
+                    <p>파생 클래스에서 재정의한 함수 내에서 기본 클래스의 구현을 호출할 때는 범위 지정 연산자(::) 사용</p>
+                    <code class="keyword">void</code> <span class="function">draw</span>() <span
+                        class="keyword">override</span> {
+                    <span class="type">Shape</span>::<span class="function">draw</span>(); <span class="comment">// 기본
+                        클래스 구현 호출</span>
+                    <span class="comment">// 추가 구현...</span>
+                    }
+                </div>
+
+                <div class="important">
+                    <strong>4. override와 final 키워드 활용 (C++11)</strong>
+                    <p><code class="keyword">override</code>: 함수가 기본 클래스의 가상 함수를 재정의함을 명시적으로 표시</p>
+                    <p><code class="keyword">final</code>: 더 이상 파생 클래스에서 재정의할 수 없음을 표시</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
