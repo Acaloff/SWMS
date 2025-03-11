@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAM 구조</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+            --text-color: #333;
+            --light-text: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --font-heading: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            --font-body: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            --code-font: 'Consolas', 'Monaco', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 5px solid var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            font-family: var(--font-heading);
+            color: var(--secondary-color);
+            margin: 1.5rem 0 1rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-family: var(--font-heading);
+            color: var(--secondary-color);
+            margin: 1.5rem 0 0.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .ram-structure {
+            display: flex;
+            flex-direction: column;
+            margin: 2rem 0;
+            box-shadow: var(--card-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .ram-section {
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .ram-section:nth-child(odd) {
+            background-color: #fff;
+        }
+        
+        .ram-section:nth-child(even) {
+            background-color: var(--light-bg);
+        }
+        
+        .ram-section-label {
+            position: absolute;
+            right: 2rem;
+            top: 1.5rem;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .address {
+            font-family: var(--code-font);
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .alert {
+            font-family: var(--code-font);
+            color: var(--accent-color);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            border-radius: 5px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: var(--code-font);
+            color: #f8f8f2;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            white-space: pre;
+        }
+        
+        .comment {
+            color: #6a9955;
+        }
+        
+        .keyword {
+            color: #569cd6;
+        }
+        
+        .string {
+            color: #ce9178;
+        }
+        
+        .type {
+            color: #4ec9b0;
+        }
+        
+        .function {
+            color: #dcdcaa;
+        }
+        
+        .number {
+            color: #b5cea8;
+        }
+        
+        .memory-diagram {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .memory-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 2px solid #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .memory-block {
+            padding: 1rem;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+            position: relative;
+        }
+        
+        .memory-block:last-child {
+            border-bottom: none;
+        }
+        
+        .memory-block.stack {
+            background-color: #f8d7da;
+        }
+        
+        .memory-block.heap {
+            background-color: #d1e7dd;
+            min-height: 80px;
+        }
+        
+        .memory-block.bss {
+            background-color: #fff3cd;
+        }
+        
+        .memory-block.data {
+            background-color: #cff4fc;
+        }
+        
+        .memory-block.code {
+            background-color: #e2e3e5;
+        }
+        
+        .memory-address {
+            position: absolute;
+            right: 1rem;
+            font-family: var(--code-font);
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .arrow {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .example-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px 4px 0 0;
+            font-weight: bold;
+        }
+        
+        .example-content {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .note {
+            background-color: #e7f5ff;
+            border-left: 5px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .ram-section-label {
+                position: static;
+                display: inline-block;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>RAM 구조</h1>
+            <p>code, data, bss, heap, stack으로 구성된 C++ 프로그램의 메모리 구조</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section>
+            <h2>RAM 구조 개요</h2>
+            <p>C++ 프로그램이 실행될 때, 너의 운영체제(망할 팽귄이나 창문, 사과 등)는 프로그램을 위한 가상 메모리 공간을 할당한다.<br>
+                 이 메모리 공간은 아래와 같은 구조로 나뉜다:</p>
+            
+            <div class="memory-diagram">
+                <h3>메모리 레이아웃</h3>
+                <div class="memory-container">
+                    <div class="memory-block stack">
+                        <strong>스택(Stack)</strong> - 호출한 함수, 지역 변수
+                        <div class="memory-address">높은 주소부터 시작 (0xFFFF...)</div>
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div class="memory-block heap">
+                        <strong>힙(Heap)</strong> - 동적 메모리 할당. 너가 직접 해야됨.
+                    </div>
+                    <div class="arrow">↓</div>
+                    <div class="memory-block bss">
+                        <strong>BSS</strong> - 초기화되지 않은 전역/정적 변수
+                    </div>
+                    <div class="memory-block data">
+                        <strong>데이터(Data)</strong> - 초기화된 전역/정적 변수
+                    </div>
+                    <div class="memory-block code">
+                        <strong>코드(Code)</strong> - 프로그램 명령어
+                        <div class="memory-address">낮은 주소 (0x0000...)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="ram-structure">
+            <div class="ram-section">
+                <div class="ram-section-label">Code</div>
+                <h3>코드 영역 (Text)</h3>
+                <div class="address">주소 범위: 낮은 주소 영역</div>
+                <p>프로그램의 실행 코드가 저장되는 영역. 컴파일된 기계어 명령어가 이 영역에 위치한다.<br> 
+                    이 영역은 읽기 전용이며 실행 가능.</p>
+                
+                <div class="code-block">
+<code><span class="comment">// 코드영역 예시</span>
+<span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="comment">// 이 함수의 명령어들은 코드 영역에 저장됨</span>
+    <span class="keyword">int</span> localVar = <span class="number">10</span>;
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code>
+                </div>
+                
+                <div class="note">
+                    <strong>참고:</strong> 코드 영역은 읽기 전용. 런타임 중 수정 불가능. 보안상 이유이므로 불만 가지지 말 것.
+                </div>
+            </div>
+            
+            <div class="ram-section">
+                <div class="ram-section-label">Data</div>
+                <h3>데이터 영역</h3>
+                <div class="address">주소 범위: 코드 영역 위</div>
+                <p>초기화된 전역 변수와 정적(static) 변수가 저장되는 영역. 프로그램 시작 시 이미 값이 할당된 변수들이 이 영역에 위치한다.</p>
+                
+                <div class="code-block">
+<code><span class="comment">// 데이터 영역에 저장되는 변수들</span>
+<span class="keyword">int</span> globalVar = <span class="number">100</span>;                <span class="comment">// 초기화된 전역 변수</span>
+<span class="keyword">const</span> <span class="keyword">int</span> Wasu = <span class="number">80472</span>;        <span class="comment">// 상수 데이터</span>
+<span class="keyword">static</span> <span class="keyword">int</span> staticInitVar = <span class="number">50</span>;    <span class="comment">// 초기화된 정적 변수</span>
+
+<span class="keyword">class</span> <span class="type">MyClass</span> {
+<span class="keyword">public</span>:
+    <span class="keyword">static</span> <span class="keyword">int</span> classVar;
+};
+
+<span class="keyword">int</span> <span class="type">MyClass</span>::classVar = <span class="number">200</span>;      <span class="comment">// 클래스의 정적 멤버 변수</span></code>
+                </div>
+            </div>
+            
+            <div class="ram-section">
+                <div class="ram-section-label">BSS</div>
+                <h3>BSS 영역 (Block-Started-by-Symbol)</h3>
+                <div class="address">주소 범위: 데이터 위</div>
+                <p>초기화되지 않은 전역 변수와 정적 변수가 저장되는 영역. 
+                    이 변수들은 프로그램 시작 시 0으로 초기화됨.</p>
+                
+                <div class="code-block">
+<code><span class="comment">// BSS 영역에 저장되는 변수들</span>
+<span class="keyword">int</span> uninitGlobalVar;                <span class="comment">// 초기화되지 않은 전역 변수</span>
+<span class="keyword">static</span> <span class="keyword">int</span> uninitStaticVar;        <span class="comment">// 초기화되지 않은 정적 변수</span>
+<span class="keyword">static</span> <span class="keyword">char</span> buffer[<span class="number">1024</span>];        <span class="comment">// 초기화되지 않은 배열</span>
+
+<span class="keyword">class</span> <span class="type">AnotherClass</span> {
+<span class="keyword">public</span>:
+    <span class="keyword">static</span> <span class="keyword">int</span> uninitClassVar;
+};
+
+<span class="keyword">int</span> <span class="type">AnotherClass</span>::uninitClassVar;  <span class="comment">// 초기화되지 않은 클래스 정적 변수</span></code>
+                </div>
+                
+                <div class="note">
+                    <strong>참고:</strong> BSS 영역는 실제로 프로그램의 실행 파일에 포함되지 않는다.<br>
+                     대신, 실행 시 운영체제(어떤 교수님은 직접적으로 커널이라고 부르심)가 이 영역을 0으로 초기화함. 배열이면 원소 전부 0으로.
+                </div>
+            </div>
+            
+            <div class="ram-section">
+                <div class="ram-section-label">Heap</div>
+                <h3>힙 (Heap)</h3>
+                <div class="address">주소 범위: BSS 영역 위</div>
+                <p>동적으로 할당된 메모리가 저장되는 영역. C++에서는 <code><span class="keyword">new</span></code> 연산자를 사용하여 힙 메모리를 할당, <code><span class="keyword">delete</span></code> 연산자를 사용하여 해제한다.<br></p>
+                <h2><span class="alert">너가 직접 해야 한다 .</span></h2>
+                
+                <div class="code-block">
+<code><span class="keyword">void</span> <span class="function">heapExample</span>() {
+    <span class="comment">// 힙에 int 타입 메모리 할당</span>
+    <span class="keyword">int</span>* dynamicInt = <span class="keyword">new</span> <span class="keyword">int</span>;
+    *dynamicInt = <span class="number">42</span>;
+    
+    <span class="comment">// 힙에 int 배열 할당</span>
+    <span class="keyword">int</span>* dynamicArray = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];
+    dynamicArray[<span class="number">0</span>] = <span class="number">100</span>;
+    
+    <span class="comment">// 힙에 객체 할당</span>
+    <span class="type">MyClass</span>* obj = <span class="keyword">new</span> <span class="type">MyClass</span>();
+    
+    <span class="comment">// 메모리 해제 (해제하지 않으면 메모리 누수 발생. 너 회사 짤린다고.)</span>
+    <span class="keyword">delete</span> dynamicInt;
+    <span class="keyword">delete</span>[] dynamicArray;
+    <span class="keyword">delete</span> obj;
+    
+    <span class="comment">// 스마트 포인터 사용 예시 (C++11 이상)</span>
+    <span class="type">std</span>::<span class="type">unique_ptr</span><<span class="type">int</span>> smartInt = <span class="type">std</span>::<span class="function">make_unique</span><<span class="type">int</span>>(<span class="number">100</span>);
+    <span class="comment">// 자동으로 메모리 해제</span>
+}</code>
+                </div>
+                
+                <div class="note">
+                    <strong>참고:</strong> 힙은 프로그램 실행 중에 크기가 변함,<br>
+                     그리고 메모리 할당 및 해제를 '너가' 직접 관리해야 한다.<br>
+                     메모리를 해제하지 않으면 메모리 누수가 발생해 서버 다 털린다. 니 직장도 함께
+                </div>
+            </div>
+            
+            <div class="ram-section">
+                <div class="ram-section-label">Stack</div>
+                <h3>스택 (Stack)</h3>
+                <div class="address">주소 범위: 높은 주소 영역, 힙 영역과 메모리 유동적으로 공유.</div>
+                <p>함수 호출 정보, 지역 변수, 함수 매개변수가 저장되는 영역이다. 함수가 호출될 때마다 스택 프레임이 생성, 종료되면 자동으로 해제된다. <br>
+                    ex) main함수의 스택프레임</p>
+                
+                <div class="code-block">
+<code><span class="keyword">void</span> <span class="function">functionA</span>(<span class="keyword">int</span> param) {
+    <span class="comment">// param은 스택에 저장됨 (함수 매개변수)</span>
+    <span class="keyword">int</span> localVar = <span class="number">10</span>;        <span class="comment">// 스택에 저장됨 (지역 변수)</span>
+    <span class="keyword">static</span> <span class="keyword">int</span> staticVar = <span class="number">20</span>;  <span class="comment">// 데이터 영역에 저장됨 (정적 변수)</span>
+    
+    <span class="keyword">char</span> buffer[<span class="number">1024</span>];        <span class="comment">// 스택에 저장됨 (지역 배열)</span>
+    <span class="function">functionB</span>();              <span class="comment">// 함수 호출 시 반환 주소가 스택에 저장됨</span>
+}
+
+<span class="keyword">void</span> <span class="function">stackExample</span>() {
+    <span class="keyword">int</span> x = <span class="number">5</span>;              <span class="comment">// 스택에 저장됨</span>
+    <span class="function">functionA</span>(x);           <span class="comment">// 함수 호출 시 x의 값이 스택에 복사됨</span>
+    
+    <span class="comment">// 스택 오버플로우 예시 (주의: 이 코드 주석 풀어서 실제로 실행하면 너 후회함.)</span>
+    <span class="comment">// void recursiveFunction() {</span>
+    <span class="comment">//     int largeArray[1000000]; // 지나치게 큰 지역 배열</span>
+    <span class="comment">//     recursiveFunction(); // 무한 재귀 호출</span>
+    <span class="comment">// }</span>
+}</code>
+                </div>
+                
+                <div class="note">
+                    <strong>참고:</strong> 스택은 크기가 제한되어 있으며, 스택 공간을 초과하면 '스택 오버플로우'가 발생한다. 그 유명한 그거.<br>
+                     스텍 영역은 네 생각보다 분명 작으니까 처신 잘 할 것.                
+                    </div>
+            </div>
+        </div>
+        
+        <section>
+            <h2>종합 예제</h2>
+            
+            <div class="example-header">
+                RAM 구조를 모두 사용하는 C++ 프로그램 예시
+            </div>
+            <div class="example-content">
+                <div class="code-block">
+<code><span class="comment">// 전체 RAM 구조를 보여준다</span>
+<span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;memory&gt;</span>
+
+<span class="comment">// 코드 영역: 함수 정의</span>
+<span class="keyword">void</span> <span class="function">printMemoryInfo</span>(<span class="keyword">const</span> <span class="keyword">char</span>* message) {
+    <span class="type">std</span>::<span class="function">cout</span> << message << <span class="type">std</span>::<span class="function">endl</span>;
+}
+
+<span class="comment">// 데이터 영역: 초기화된 전역 변수</span>
+<span class="keyword">int</span> globalInitVar = <span class="number">100</span>;
+<span class="keyword">const</span> <span class="keyword">int</span> MAX_BUFFER = <span class="number">1024</span>;
+
+<span class="comment">// BSS 영역: 초기화되지 않은 전역 변수</span>
+<span class="keyword">int</span> globalUninitVar;
+<span class="keyword">static</span> <span class="keyword">char</span> staticBuffer[<span class="number">1024</span>];
+
+<span class="keyword">class</span> <span class="type">MemoryExample</span> {
+<span class="keyword">private</span>:
+    <span class="keyword">int</span> memberVar;
+
+<span class="keyword">public</span>:
+    <span class="keyword">static</span> <span class="keyword">int</span> classStaticVar;  <span class="comment">// 데이터 영역 (초기화 후)</span>
+    
+    <span class="function">MemoryExample</span>() : memberVar(<span class="number">0</span>) {
+        <span class="function">printMemoryInfo</span>(<span class="string">"객체 생성됨 (스택 또는 힙)"</span>);
+    }
+    
+    <span class="keyword">void</span> <span class="function">allocateMemory</span>() {
+        <span class="comment">// 스택: 지역 변수</span>
+        <span class="keyword">int</span> localVar = <span class="number">42</span>;
+        
+        <span class="comment">// 힙: 동적 메모리 할당</span>
+        <span class="keyword">int</span>* dynamicInt = <span class="keyword">new</span> <span class="keyword">int</span>(<span class="number">99</span>);
+        
+        <span class="function">printMemoryInfo</span>(<span class="string">"메모리 할당됨"</span>);
+        
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"지역 변수 (스택): "</span> << localVar << <span class="type">std</span>::<span class="function">endl</span>;
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"동적 변수 (힙): "</span> << *dynamicInt << <span class="type">std</span>::<span class="function">endl</span>;
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"전역 변수 (데이터): "</span> << globalInitVar << <span class="type">std</span>::<span class="function">endl</span>;
+        <span class="type">std</span>::<span class="function">cout</span> << <span class="string">"초기화되지 않은 전역 변수 (BSS): "</span> << globalUninitVar << <span class="type">std</span>::<span class="function">endl</span>;
+        
+        <span class="comment">// 힙 메모리 해제</span>
+        <span class="keyword">delete</span> dynamicInt;
+    }
+};
+
+<span class="comment">// 데이터 영역: 정적 클래스 멤버 초기화</span>
+<span class="keyword">int</span> <span class="type">MemoryExample</span>::classStaticVar = <span class="number">500</span>;
+
+<span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="function">printMemoryInfo</span>(<span class="string">"프로그램 시작"</span>);
+    
+    <span class="comment">// 스택: 객체 생성</span>
+    <span class="type">MemoryExample</span> stackObject;
+    stackObject.<span class="function">allocateMemory</span>();
+    
+    <span class="comment">// 힙: 객체 동적 생성</span>
+    <span class="type">MemoryExample</span>* heapObject = <span class="keyword">new</span> <span class="type">MemoryExample</span>();
+    heapObject-><span class="function">allocateMemory</span>();
+    
+    <span class="comment">// 스마트 포인터 사용 (C++11 이상)</span>
+    <span class="type">std</span>::<span class="type">unique_ptr</span><<span class="type">MemoryExample</span>> smartObject = 
+        <span class="type">std</span>::<span class="function">make_unique</span><<span class="type">MemoryExample</span>>();
+    smartObject-><span class="function">allocateMemory</span>();
+    
+    <span class="comment">// 힙 메모리 해제</span>
+    <span class="keyword">delete</span> heapObject;
+    
+    <span class="function">printMemoryInfo</span>(<span class="string">"프로그램 종료"</span>);
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code>
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <h2>메모리 관리 모범 사례</h2>
+            
+            <ul>
+                <li>항상 동적으로 할당한 메모리는 <code><span class="keyword">delete</span></code>로 해제.</li>
+                <li>메모리 누수를 방지하기 위해 스마트 포인터(<code><span class="keyword">std::unique_ptr</span></code>, <code><span class="keyword">std::shared_ptr</span></code>)를 사용.</li>
+                <li>지역 변수와 자동 메모리 관리를 위해 가능한 스택에서 작동하게 프로그래밍.</li>
+                <li>전역 변수의 사용은 굳이 하지 말 것것, 필요한 경우 네임스페이스나 클래스 내 정적 멤버를 활용.</li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>
