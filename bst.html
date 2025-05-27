@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자살률 문제 해결 정책 우선순위 토론</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 90%;
+            max-width: 1000px;
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 2.5em;
+            margin-bottom: 25px;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #87CEEB;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .content {
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .keyword-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .keyword-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .keyword-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .keyword-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .keyword-content {
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+
+        .highlight {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .stat {
+            color: #87CEEB;
+            font-weight: bold;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        .intro-points {
+            text-align: left;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .intro-points li {
+            margin-bottom: 15px;
+            list-style: none;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .intro-points li::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #FFD700;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">8</span>
+    </div>
+
+    <div class="slideshow-container">
+        <!-- Slide 1: 제목 -->
+        <div class="slide active">
+            <h1>자살률 1위 문제 해결</h1>
+            <div class="subtitle">경제정책 vs 정서적 복지</div>
+            <div class="subtitle">어떤 정책이 우선되어야 하는가?</div>
+            <div style="margin-top: 50px; font-size: 1.5em; color: #FFD700;">
+                비판적사고와토론 6조
+            </div>
+        </div>
+
+        <!-- Slide 2: 서론 -->
+        <div class="slide">
+            <h2>토론 배경</h2>
+            <div class="content">
+                <ul class="intro-points">
+                    <li><span class="highlight">OECD 자살률 1위</span> 대한민국의 심각한 현실</li>
+                    <li><span class="highlight">복합적 사회구조 문제</span> - 청소년부터 노인까지 전 연령층</li>
+                    <li>경제성장에도 불구하고 <span class="highlight">국민 행복도는 여전히 낮음</span></li>
+                    <li>한정된 예산과 자원의 <span class="highlight">효율적 배분 필요</span></li>
+                </ul>
+                
+                <div style="text-align: center; margin-top: 40px; font-size: 1.3em; color: #87CEEB;">
+                    <strong>어떤 정책에 우선순위를 두어야 할까?</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 정서적 복지 1 -->
+        <div class="slide">
+            <h2>정서적 복지 우선론 ①</h2>
+            <h3>직접적 원인 해결이 우선</h3>
+            <div class="keyword-grid">
+                <div class="keyword-box">
+                    <div class="keyword-title">정신건강이 핵심 원인</div>
+                    <div class="keyword-content">
+                        자살사망자의 <span class="stat">80-90%</span>가<br>
+                        정신건강 문제 보유<br>
+                        <small>(2023 심리부검 결과)</small>
+                    </div>
+                </div>
+                <div class="keyword-box">
+                    <div class="keyword-title">1인 가구 자살 원인</div>
+                    <div class="keyword-content">
+                        정신건강 스트레스 <span class="stat">40%</span><br>
+                        vs 직업 스트레스 <span class="stat">15%</span><br>
+                        <small>정서적 문제가 2.7배 높음</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 정서적 복지 2 -->
+        <div class="slide">
+            <h2>정서적 복지 우선론 ②</h2>
+            <h3>현재 지원 체계의 효과성</h3>
+            <div class="keyword-grid">
+                <div class="keyword-box">
+                    <div class="keyword-title">24시간 상담 서비스</div>
+                    <div class="keyword-content">
+                        <span class="stat">55,053명</span> 신청<br>
+                        <span class="stat">241,524건</span> 서비스 제공<br>
+                        <small>높은 반복 이용률 = 실질적 도움</small>
+                    </div>
+                </div>
+                <div class="keyword-box">
+                    <div class="keyword-title">자살 신호 인식 부족</div>
+                    <div class="keyword-content">
+                        <span class="stat">90%</span> 이상이 사전 신호 발송<br>
+                        주변 인식률은 <span class="stat">30%</span> 이하<br>
+                        <small>조기 발견 시스템 필요</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 정서적 복지 3 -->
+        <div class="slide">
+            <h2>정서적 복지 우선론 ③</h2>
+            <h3>경제 지원의 한계</h3>
+            <div class="keyword-grid">
+                <div class="keyword-box">
+                    <div class="keyword-title">복잡한 신청 절차</div>
+                    <div class="keyword-content">
+                        엄격한 선정 기준<br>
+                        <span class="highlight">사각지대 발생</span><br>
+                        <small>실제 필요한 사람이 탈락</small>
+                    </div>
+                </div>
+                <div class="keyword-box">
+                    <div class="keyword-title">정부 정책 방향</div>
+                    <div class="keyword-content">
+                        보건복지부 대응방안의<br>
+                        <span class="highlight">대부분이 정서적 지원</span><br>
+                        <small>모방자살 방지, 위기대응체계 등</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: 경제정책 1 -->
+        <div class="slide">
+            <h2>경제정책 우선론 ①</h2>
+            <h3>명확한 통계적 상관관계</h3>
+            <div class="keyword-grid">
+                <div class="keyword-box">
+                    <div class="keyword-title">실업과 자살의 관계</div>
+                    <div class="keyword-content">
+                        실업 상태일 때<br>
+                        자살 위험 <span class="stat">2.5배</span> 증가<br>
+                        <small>(2021 통계청)</small>
+                    </div>
+                </div>
+                <div class="keyword-box">
+                    <div class="keyword-title">경제 여건과 자살 충동</div>
+                    <div class="keyword-content">
+                        경제적 여건 악화 시<br>
+                        <span class="highlight">자살 생각 유의미 증가</span><br>
+                        <small>(한국보건사회연구원, 2022)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: 경제정책 2 -->
+        <div class="slide">
+            <h2>경제정책 우선론 ②</h2>
+            <h3>경제 안정이 정서 회복의 기반</h3>
+            <div class="keyword-grid">
+                <div class="keyword-box">
+                    <div class="keyword-title">Maslow 욕구 단계</div>
+                    <div class="keyword-content">
+                        <span class="highlight">생리적 욕구 → 안전 욕구</span><br>
+                        기본 단계 충족 후<br>
+                        상위 욕구 작동 가능
+                    </div>
+                </div>
+                <div class="keyword-box">
+                    <div class="keyword-title">경제적 자립감의 효과</div>
+                    <div class="keyword-content">
+                        우울감과 자살충동 완화에<br>
+                        <span class="stat">가장 큰 영향 요인</span><br>
+                        <small>(서울대 보건대학원, 2020)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: 경제정책 3 -->
+        <div class="slide">
+            <h2>경제정책 우선론 ③</h2>
+            <h3>구조적 예방 시스템 구축</h3>
+            <div class="keyword-grid">
+                <div class="keyword-box">
+                    <div class="keyword-title">기초연금 도입 효과</div>
+                    <div class="keyword-content">
+                        2014-2018년<br>
+                        <span class="stat">65세 이상 자살률 지속 감소</span><br>
+                        <small>경제적 스트레스 완화</small>
+                    </div>
+                </div>
+                <div class="keyword-box">
+                    <div class="keyword-title">북유럽 성공 모델</div>
+                    <div class="keyword-content">
+                        덴마크, 스웨덴 등<br>
+                        <span class="highlight">경제 복지 → 정서 복지</span><br>
+                        <small>무상 의료, 교육, 기본소득 선행</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">◀ 이전</button>
+        <button class="nav-btn" onclick="nextSlide()">다음 ▶</button>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            document.getElementById('currentSlide').textContent = index + 1;
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+            showSlide(currentSlideIndex);
+        }
+
+        function previousSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+            showSlide(currentSlideIndex);
+        }
+
+        // 키보드 네비게이션
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                nextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // 터치 네비게이션 (모바일)
+        let startX = 0;
+        document.addEventListener('touchstart', function(event) {
+            startX = event.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', function(event) {
+            const endX = event.changedTouches[0].clientX;
+            const diff = startX - endX;
+            
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    previousSlide();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
